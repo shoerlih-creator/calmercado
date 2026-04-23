@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Costos - Restaurante</title>
+    <style>
+        :root {
+            --neon-cian: #00f2ff;
+            --neon-purple: #bc13fe;
+            --neon-green: #39ff14;
+            --neon-red: #ff4444;
+            --dark-bg: #121212;
+            --card-bg: #2a2d34;
+            --input-bg: #000000;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px solid var(--neon-cian);
+            box-shadow: 0 0 20px var(--neon-cian);
+            width: 90%;
+            max-width: 380px;
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--neon-cian);
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--neon-cian);
+            margin-bottom: 20px;
+        }
+
+        .input-group { margin-bottom: 12px; }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--neon-purple);
+            border-radius: 12px;
+            color: var(--neon-green);
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-sizing: border-box;
+            text-align: center;
+            outline: none;
+        }
+
+        .divider {
+            height: 1px;
+            background: #444;
+            margin: 20px 0;
+        }
+
+        .result-box {
+            background-color: #333;
+            padding: 12px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+            border: 1px solid #444;
+        }
+
+        .result-label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #eee;
+        }
+
+        .result-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--neon-green);
+        }
+
+        .sugerencia { color: var(--neon-cian); }
+
+        /* Estilo para la Alerta de Pérdida */
+        .alerta-box {
+            border: 2px solid var(--neon-red);
+            background-color: #400;
+        }
+
+        .alerta-value {
+            color: var(--neon-red);
+            text-shadow: 0 0 5px var(--neon-red);
+        }
+
+        .info-text {
+            font-size: 0.7rem;
+            color: #888;
+            text-align: center;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>COSTO POR PLATO</h2>
+
+    <div class="input-group">
+        <label>Insumo Principal (Carne)</label>
+        <input type="number" id="carne" value="0.80" oninput="calcular()">
+    </div>
+
+    <div class="input-group">
+        <label>Guarnición (Arroz, papa, etc.)</label>
+        <input type="number" id="guarnicion" value="1.00" oninput="calcular()">
+    </div>
+
+    <div class="input-group">
+        <label>Condimentos</label>
+        <input type="number" id="condimentos" value="0.50" oninput="calcular()">
+    </div>
+
+    <div class="input-group">
+        <label>Chicha / Bebida</label>
+        <input type="number" id="chicha" value="0.50" oninput="calcular()">
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="input-group">
+        <label style="color: var(--neon-green);">¿A cuánto lo vende ella? (Precio Real)</label>
+        <input type="number" id="precio-real" value="7.00" oninput="calcular()" style="border-color: var(--neon-green);">
+    </div>
+
+    <div class="result-box">
+        <span class="result-label">Costo Total Insumos</span>
+        <div id="costo-total" class="result-value">S/ 2.80</div>
+    </div>
+
+    <div class="result-box">
+        <span class="result-label">Sugerencia (Margen 65%)</span>
+        <div id="sugerencia-venta" class="result-value sugerencia">S/ 8.00</div>
+    </div>
+
+    <div id="alerta-perdidia-box" class="result-box alerta-box" style="display: none;">
+        <span class="result-label" style="color: white;">DINERO DEJADO DE GANAR:</span>
+        <div id="perdida-valor" class="result-value alerta-value">S/ 0.00</div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        const n1 = parseFloat(document.getElementById('carne').value) || 0;
+        const n2 = parseFloat(document.getElementById('guarnicion').value) || 0;
+        const n3 = parseFloat(document.getElementById('condimentos').value) || 0;
+        const n4 = parseFloat(document.getElementById('chicha').value) || 0;
+        const precioReal = parseFloat(document.getElementById('precio-real').value) || 0;
+
+        const total = n1 + n2 + n3 + n4;
+        
+        // El precio ideal para ganar el 65% (Costo es el 35%)
+        const sugerido = total / 0.35;
+
+        document.getElementById('costo-total').innerText = "S/ " + total.toFixed(2);
+        document.getElementById('sugerencia-venta').innerText = "S/ " + sugerido.toFixed(2);
+
+        // Lógica de Alerta de Pérdida
+        const boxPerdida = document.getElementById('alerta-perdidia-box');
+        if (precioReal < sugerido && precioReal > 0) {
+            const diferencia = sugerido - precioReal;
+            document.getElementById('perdida-valor').innerText = "S/ " + diferencia.toFixed(2);
+            boxPerdida.style.display = "block";
+        } else {
+            boxPerdida.style.display = "none";
+        }
+    }
+    
+    calcular();
+</script>
+
+</body>
+</html>
+
